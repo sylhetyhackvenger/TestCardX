@@ -1,4 +1,4 @@
-🚀 TestCardX v3.0
+# 🚀 TestCardX 
 
 <p align="center">
   <img src="https://img.shields.io/badge/STATUS-ACTIVE-00ff88?style=for-the-badge&logo=github" alt="Status">

@@ -1,5 +1,7 @@
 # 🚀 TestCardX 
-
+<p align="center">
+  <img src="assets/1.png" alt="Banner 1" width="100%">
+</p>
 <p align="center">
   <img src="https://img.shields.io/badge/STATUS-ACTIVE-00ff88?style=for-the-badge&logo=github" alt="Status">
   <img src="https://img.shields.io/badge/VERSION-3.0-ff00ff?style=for-the-badge&logo=verizon" alt="Version">

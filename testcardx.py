@@ -15,12 +15,7 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 
-# ============================================================
-# ANSI & TUI UTILITIES
-# ============================================================
-
 class Colors:
-    """ANSI color codes for futuristic terminal output."""
     RESET = "\033[0m"
     BOLD = "\033[1m"
     DIM = "\033[2m"
@@ -30,7 +25,6 @@ class Colors:
     REVERSE = "\033[7m"
     HIDDEN = "\033[8m"
 
-    # Foreground
     BLACK = "\033[30m"
     RED = "\033[31m"
     GREEN = "\033[32m"
@@ -48,7 +42,6 @@ class Colors:
     BRIGHT_CYAN = "\033[96m"
     BRIGHT_WHITE = "\033[97m"
 
-    # Background
     BG_BLACK = "\033[40m"
     BG_RED = "\033[41m"
     BG_GREEN = "\033[42m"
@@ -68,8 +61,6 @@ class Colors:
 
     @staticmethod
     def gradient(text: str, color1: str = CYAN, color2: str = MAGENTA) -> str:
-        """Apply a simple gradient effect to text."""
-        # Simplified gradient: alternate between two colors
         chars = list(text)
         result = []
         for i, char in enumerate(chars):
@@ -80,18 +71,15 @@ class Colors:
         return "".join(result) + Colors.RESET
 
 def clear_screen() -> None:
-    """Clear the terminal screen."""
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def print_centered(text: str, width: int = 80) -> None:
-    """Print text centered within a given width."""
     lines = text.split('\n')
     for line in lines:
         padding = max(0, (width - len(line)) // 2)
         print(' ' * padding + line)
 
 def print_header(title: str, subtitle: str = "") -> None:
-    """Print a futuristic header."""
     width = 80
     border = "═" * width
     print(f"{Colors.BRIGHT_CYAN}{border}{Colors.RESET}")
@@ -101,23 +89,16 @@ def print_header(title: str, subtitle: str = "") -> None:
     print(f"{Colors.BRIGHT_CYAN}{border}{Colors.RESET}")
 
 def print_footer() -> None:
-    """Print a futuristic footer."""
     width = 80
     border = "═" * width
     print(f"{Colors.BRIGHT_CYAN}{border}{Colors.RESET}")
     print(f"{Colors.DIM}{'TestCardX v3.0 | Author: SYLHETYHACKVENGER (THE-ERROR808)'.center(width)}{Colors.RESET}")
     print(f"{Colors.BRIGHT_CYAN}{border}{Colors.RESET}")
 
-# ============================================================
-# ANIMATED ASCII BANNER
-# ============================================================
-
 class AnimatedBanner:
-    """Display animated ASCII art banner."""
 
     @staticmethod
     def get_credit_card_ascii() -> str:
-        """Return the credit card vintage ASCII art."""
         return """
   .......,:i1i1t111;:..,,:;1tttt11iiiii:,,.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,::,::,,,,,,,,,:::::::,,
  .........,:i1ttii;:::;itfLCCCLLLLfffffftti,.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,:;::;;:,,,,,,,,,,::::;;::
@@ -160,7 +141,6 @@ class AnimatedBanner:
 
     @staticmethod
     def animate_banner(frames: int = 5, delay: float = 0.1) -> None:
-        """Display animated banner with slight color shifts."""
         ascii_art = AnimatedBanner.get_credit_card_ascii()
         colors = [Colors.BRIGHT_CYAN, Colors.BRIGHT_MAGENTA, Colors.BRIGHT_YELLOW, Colors.BRIGHT_GREEN, Colors.BRIGHT_BLUE]
 
@@ -170,16 +150,10 @@ class AnimatedBanner:
             colored_art = "\n".join([f"{color}{line}{Colors.RESET}" for line in ascii_art.split('\n')])
             print_centered(colored_art)
             time.sleep(delay)
-            # Add a subtle shimmer effect
             shimmer = random.choice(["░", "▒", "▓", "█"])
             print(f"{Colors.DIM}{shimmer * 40}{Colors.RESET}")
 
-# ============================================================
-# CORE DATA MODELS
-# ============================================================
-
 class CardIssuer(Enum):
-    """Credit card issuer types."""
     VISA = "Visa"
     MASTERCARD = "Mastercard"
     AMEX = "Amex"
@@ -192,7 +166,6 @@ class CardIssuer(Enum):
 
 @dataclass
 class CardData:
-    """Structured card data."""
     card_number: str
     expiry_month: str
     expiry_year: str
@@ -210,15 +183,12 @@ class CardData:
             self.generated_at = datetime.now().isoformat()
 
     def to_pipe(self) -> str:
-        """Format as pipe-separated string."""
         return f"{self.card_number}|{self.expiry_month}|{self.expiry_year}|{self.cvv}"
 
     def to_json(self) -> Dict:
-        """Convert to JSON-compatible dict."""
         return asdict(self)
 
     def to_csv_row(self) -> List[str]:
-        """Convert to CSV row."""
         return [
             self.card_number,
             self.expiry_month,
@@ -235,7 +205,6 @@ class CardData:
 
 @dataclass
 class ValidationResult:
-    """Result of card validation."""
     valid: bool
     card_number: str
     issuer: CardIssuer
@@ -244,12 +213,7 @@ class ValidationResult:
     errors: List[str]
     warnings: List[str]
 
-# ============================================================
-# COUNTRY-SPECIFIC BIN DATABASE (ENHANCED)
-# ============================================================
-
 class BINDatabase:
-    """Enhanced BIN database with country-specific data."""
 
     COUNTRY_DATA = {
         "Bangladesh": {
@@ -404,17 +368,14 @@ class BINDatabase:
 
     @classmethod
     def get_countries(cls) -> List[str]:
-        """Get list of supported countries."""
         return list(cls.COUNTRY_DATA.keys())
 
     @classmethod
     def get_country_data(cls, country: str) -> Dict:
-        """Get data for a specific country."""
         return cls.COUNTRY_DATA.get(country, cls.COUNTRY_DATA["USA"])
 
     @classmethod
     def detect_issuer(cls, card_number: str) -> Tuple[CardIssuer, str, str]:
-        """Detect issuer, country, and bank from card number."""
         for country, data in cls.COUNTRY_DATA.items():
             for issuer, prefixes in data["prefixes"].items():
                 for prefix in prefixes:
@@ -423,12 +384,7 @@ class BINDatabase:
                         return issuer, country, bank
         return CardIssuer.UNKNOWN, "Unknown", "Unknown Bank"
 
-# ============================================================
-# CARD GENERATION ENGINE (TYPE-SAFE)
-# ============================================================
-
 class CardGenerator:
-    """Type-safe credit card generation engine."""
 
     def __init__(self, country: str = "USA"):
         self.country = country
@@ -436,7 +392,6 @@ class CardGenerator:
         self.logger = logging.getLogger(__name__)
 
     def luhn_checksum(self, partial: str) -> int:
-        """Calculate Luhn checksum digit."""
         digits = [int(d) for d in partial]
         for i in range(len(digits) - 1, -1, -2):
             digits[i] *= 2
@@ -446,7 +401,6 @@ class CardGenerator:
         return (10 - (total % 10)) % 10
 
     def generate_card_number(self, bin_prefix: str, length: int) -> str:
-        """Generate a valid card number using Luhn algorithm."""
         remaining = length - len(bin_prefix) - 1
         if remaining < 0:
             bin_prefix = bin_prefix[:length - 1]
@@ -458,18 +412,15 @@ class CardGenerator:
         return partial + str(checksum)
 
     def generate_expiry(self, months_ahead: int = 60) -> Tuple[str, str]:
-        """Generate future expiry date."""
         now = datetime.now()
         future = now + timedelta(days=random.randint(30, months_ahead * 30))
         return f"{future.month:02d}", str(future.year)
 
     def generate_cvv(self, issuer: CardIssuer) -> str:
-        """Generate CVV based on issuer."""
         length = 4 if issuer == CardIssuer.AMEX else 3
         return ''.join(str(random.randint(0, 9)) for _ in range(length))
 
     def generate_zip_code(self) -> str:
-        """Generate country-appropriate zip code."""
         patterns = {
             "Bangladesh": lambda: f"{random.randint(1000, 9999)}",
             "India": lambda: f"{random.randint(110001, 999999):06d}",
@@ -482,7 +433,6 @@ class CardGenerator:
         return patterns.get(self.country, lambda: "00000")()
 
     def generate_phone(self) -> str:
-        """Generate country-appropriate phone number."""
         country_code = self.country_data["country_code"]
         if self.country in ["USA", "Canada"]:
             return f"+{country_code}{random.randint(200, 999):03d}{random.randint(200, 999):03d}{random.randint(1000, 9999):04d}"
@@ -494,7 +444,6 @@ class CardGenerator:
             return f"+{country_code}{random.randint(10000000, 99999999):08d}"
 
     def generate_single(self, issuer: Optional[CardIssuer] = None, include_details: bool = False) -> CardData:
-        """Generate a single card."""
         if issuer and issuer in self.country_data["prefixes"]:
             prefixes = self.country_data["prefixes"][issuer]
         else:
@@ -523,7 +472,6 @@ class CardGenerator:
 
     def generate_batch(self, count: int = 10, issuer: Optional[CardIssuer] = None,
                        include_details: bool = False, parallel: bool = False) -> List[CardData]:
-        """Generate multiple cards."""
         if parallel and count > 10:
             with ThreadPoolExecutor(max_workers=min(4, count)) as executor:
                 futures = [executor.submit(self.generate_single, issuer, include_details) for _ in range(count)]
@@ -531,16 +479,10 @@ class CardGenerator:
         else:
             return [self.generate_single(issuer, include_details) for _ in range(count)]
 
-# ============================================================
-# CARD VALIDATION ENGINE
-# ============================================================
-
 class CardValidator:
-    """Comprehensive card validation engine."""
 
     @staticmethod
     def validate_luhn(card_number: str) -> bool:
-        """Validate using Luhn algorithm."""
         digits = [int(d) for d in str(card_number)][::-1]
         total = 0
         for i, digit in enumerate(digits):
@@ -553,12 +495,10 @@ class CardValidator:
 
     @staticmethod
     def validate_length(card_number: str) -> bool:
-        """Validate card length."""
         return 14 <= len(card_number) <= 19
 
     @staticmethod
     def validate_expiry(month: str, year: str) -> Tuple[bool, str]:
-        """Validate expiry date."""
         try:
             exp_month = int(month)
             exp_year = int(year)
@@ -574,29 +514,23 @@ class CardValidator:
 
     @classmethod
     def validate_full(cls, card_data: CardData) -> ValidationResult:
-        """Full validation of card data."""
         errors = []
         warnings = []
 
-        # Luhn validation
         if not cls.validate_luhn(card_data.card_number):
             errors.append("Failed Luhn check")
 
-        # Length validation
         if not cls.validate_length(card_data.card_number):
             errors.append("Invalid length")
 
-        # Issuer detection
         detected_issuer, country, bank = BINDatabase.detect_issuer(card_data.card_number)
         if detected_issuer == CardIssuer.UNKNOWN:
             warnings.append("Unknown issuer detected")
 
-        # Expiry validation
         valid_expiry, expiry_msg = cls.validate_expiry(card_data.expiry_month, card_data.expiry_year)
         if not valid_expiry:
             errors.append(f"Expiry invalid: {expiry_msg}")
 
-        # CVV validation
         if not card_data.cvv.isdigit() or not (3 <= len(card_data.cvv) <= 4):
             errors.append("Invalid CVV format")
 
@@ -610,23 +544,16 @@ class CardValidator:
             warnings=warnings
         )
 
-# ============================================================
-# EXPORT ENGINES
-# ============================================================
-
 class ExportEngine:
-    """Handle various export formats."""
 
     @staticmethod
     def to_json(cards: List[CardData], filename: str) -> None:
-        """Export to JSON."""
         data = [c.to_json() for c in cards]
         with open(filename, 'w') as f:
             json.dump(data, f, indent=2)
 
     @staticmethod
     def to_csv(cards: List[CardData], filename: str) -> None:
-        """Export to CSV."""
         if not cards:
             return
         headers = ["Card Number", "Expiry Month", "Expiry Year", "CVV", "Issuer", "Bank", "Country", "Currency", "ZIP", "Phone", "Generated At"]
@@ -638,24 +565,17 @@ class ExportEngine:
 
     @staticmethod
     def to_pipe(cards: List[CardData]) -> str:
-        """Export as pipe-separated string."""
         return "\n".join(c.to_pipe() for c in cards)
 
     @staticmethod
     def to_sql(cards: List[CardData], table_name: str = "cards") -> str:
-        """Generate SQL INSERT statements."""
         sql = f"INSERT INTO {table_name} (card_number, expiry_month, expiry_year, cvv, issuer, bank, country, currency) VALUES\n"
         values = []
         for card in cards:
             values.append(f"  ('{card.card_number}', '{card.expiry_month}', '{card.expiry_year}', '{card.cvv}', '{card.issuer.value}', '{card.bank}', '{card.country}', '{card.currency}')")
         return sql + ",\n".join(values) + ";"
 
-# ============================================================
-# TUI APPLICATION
-# ============================================================
-
 class TestCardXTUI:
-    """Main TUI application for TestCardX."""
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -666,7 +586,6 @@ class TestCardXTUI:
         self.running = True
 
     def setup_logging(self):
-        """Setup logging configuration."""
         logging.basicConfig(
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s',
@@ -677,7 +596,6 @@ class TestCardXTUI:
         )
 
     def display_banner(self):
-        """Display the animated banner."""
         clear_screen()
         AnimatedBanner.animate_banner(frames=3, delay=0.15)
         print("\n")
@@ -690,7 +608,6 @@ class TestCardXTUI:
         print("\n")
 
     def display_menu(self):
-        """Display the main menu."""
         print(f"\n{Colors.BRIGHT_YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}")
         print(f"{Colors.BRIGHT_MAGENTA}  MAIN MENU{Colors.RESET}")
         print(f"{Colors.BRIGHT_YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}")
@@ -707,7 +624,6 @@ class TestCardXTUI:
         print(f"{Colors.BRIGHT_YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}")
 
     def generate_single_flow(self):
-        """Flow for generating a single card."""
         clear_screen()
         print_header("GENERATE SINGLE CARD", f"Country: {self.country}")
         print(f"\n{Colors.DIM}Available issuers: {', '.join([i.value for i in self.generator.country_data['issuers']])}{Colors.RESET}")
@@ -743,7 +659,6 @@ class TestCardXTUI:
         input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
     def generate_batch_flow(self):
-        """Flow for generating batch cards."""
         clear_screen()
         print_header("GENERATE BATCH CARDS", f"Country: {self.country}")
 
@@ -775,7 +690,6 @@ class TestCardXTUI:
 
         print(f"\n{Colors.BRIGHT_GREEN}✓ Generated {len(cards)} cards in {elapsed:.2f}s{Colors.RESET}")
         print(f"{Colors.BRIGHT_YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}")
-        # Show first 5 cards as preview
         preview_count = min(5, len(cards))
         for i in range(preview_count):
             card = cards[i]
@@ -787,7 +701,6 @@ class TestCardXTUI:
         input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
     def validate_card_flow(self):
-        """Flow for validating a single card."""
         clear_screen()
         print_header("VALIDATE A CARD")
 
@@ -797,7 +710,6 @@ class TestCardXTUI:
             input(f"{Colors.DIM}Press Enter to continue...{Colors.RESET}")
             return
 
-        # Try to find in last generated
         card_data = None
         for c in self.last_generated:
             if c.card_number == card_number:
@@ -807,7 +719,6 @@ class TestCardXTUI:
         if card_data:
             result = CardValidator.validate_full(card_data)
         else:
-            # Create minimal card data for validation
             detected_issuer, country, bank = BINDatabase.detect_issuer(card_number)
             card_data = CardData(
                 card_number=card_number,
@@ -840,7 +751,6 @@ class TestCardXTUI:
         input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
     def validate_batch_flow(self):
-        """Flow for validating a batch of cards."""
         clear_screen()
         print_header("VALIDATE BATCH")
 
@@ -877,7 +787,6 @@ class TestCardXTUI:
         input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
     def export_flow(self):
-        """Flow for exporting cards."""
         clear_screen()
         print_header("EXPORT CARDS")
 
@@ -927,7 +836,6 @@ class TestCardXTUI:
         input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
     def change_country_flow(self):
-        """Flow for changing the country."""
         clear_screen()
         print_header("CHANGE COUNTRY")
 
@@ -951,7 +859,6 @@ class TestCardXTUI:
         input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
     def view_statistics_flow(self):
-        """Flow for viewing statistics."""
         clear_screen()
         print_header("STATISTICS")
 
@@ -998,7 +905,6 @@ class TestCardXTUI:
         input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
     def run(self):
-        """Main application loop."""
         try:
             while self.running:
                 self.display_banner()
@@ -1040,12 +946,7 @@ class TestCardXTUI:
             print(f"\n{Colors.RED}Error: {e}{Colors.RESET}")
             self.logger.error(f"Runtime error: {e}", exc_info=True)
 
-# ============================================================
-# ENTRY POINT
-# ============================================================
-
 def main():
-    """Main entry point."""
     parser = argparse.ArgumentParser(description="TestCardX - Credit Card Testing Utility")
     parser.add_argument("--country", default="USA", help="Default country for generation")
     parser.add_argument("--generate", type=int, help="Generate N cards and exit")
@@ -1063,7 +964,6 @@ def main():
         return
 
     if args.validate:
-        # Validate a single card
         card_number = args.validate
         detected_issuer, country, bank = BINDatabase.detect_issuer(card_number)
         card = CardData(
@@ -1081,7 +981,6 @@ def main():
         return
 
     if args.generate:
-        # Generate cards and export
         generator = CardGenerator(args.country)
         cards = generator.generate_batch(args.generate, parallel=True)
         print(f"Generated {len(cards)} cards for {args.country}")
@@ -1099,11 +998,9 @@ def main():
                     f.write(ExportEngine.to_sql(cards))
             print(f"Exported to {args.output}")
         else:
-            # Print to console
             print(ExportEngine.to_pipe(cards))
         return
 
-    # Run TUI
     app = TestCardXTUI()
     app.run()
 
